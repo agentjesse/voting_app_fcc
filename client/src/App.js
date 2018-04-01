@@ -29,6 +29,7 @@ class MyProvider extends Component {
   }
 }
 
+
 class App extends Component {
   constructor(props) {
     super(props)
@@ -69,7 +70,7 @@ class App extends Component {
   render() {
     return (
       //Wrap the entire app in your enhanced provider component, and all consumer descendants will be able to access the store
-      <MyProvider> 
+      <MyProvider>
 
         <div className="App">
 
@@ -115,8 +116,6 @@ class App extends Component {
               <Link to='/squirrel-poop'>Squirrel poop</Link>
               <Link to='/dog-breath'>Dog breath</Link>
 
-              <hr/>
-
               {/*
                 different types of rendering. <Switch> renders the first mathched <Route>/<Redirect> exclusively. In contrast, every <Route> that matches the location renders inclusively.
               */}
@@ -125,6 +124,8 @@ class App extends Component {
                 <Route path='/squirrel-poop' component={ Squirrelpoop }/>
                 <Route path='/dog-breath' render={ props=> <DogBreath {...props} age={42}/> }/>
               </Switch>
+
+              <hr/>
 
             </Fragment>
           </Router>
@@ -136,6 +137,7 @@ class App extends Component {
     )
   }
 }
+
 
 const Piggy = ( {render} ) => { //destructure props.render
   const food = 'apples'
