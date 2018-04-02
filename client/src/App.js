@@ -1,10 +1,10 @@
-import React, { Component, Fragment } from 'react'
+import React, { Component, Fragment as Frag } from 'react'
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom'
-import Chart from './Chart'
 import './App.css'
 
 //initialize context, destructure result to grab Provider/Consumer component pair. 
 //Provider / Consumer components CANNOT BE RENAMED!!!!!
+// eslint-disable-next-line
 const { Provider, Consumer } = React.createContext()
 //enhance by adding state to provider component
 class MyProvider extends Component {
@@ -34,124 +34,91 @@ class App extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      response: ''
     }
   }
 
   componentDidMount() {
-    this.callApi()
-      .then(res => this.setState({ response: res.express }))
-      .catch(err => console.log(err))
-  }
-
-  callApi = async () => {
-    // console.log(`making fetch`)
-    const response = await fetch('/api/hello') //this will pass through the proxy for sure. not sure about browser based url requests...maybe react-router will handle because port 3000 is forced there?
-    const body = await response.json()
-    // console.log(`body:`,body)
-    if (response.status !== 200) throw Error(body.message)
-    return body
-  }
-
-  getGarbage = async () => {
-    try {
-      let response = await fetch('/garbage')
-      if (response.ok) {
-        let jsonResponse = await response.json()
-        console.log(`server reply:`, jsonResponse)
-        // console.log( `server reply:`, response )
-        return //return now, or error below will fire after this conditional
-      }
-      throw new Error('Request failed!')
-    }
-    catch (err) { console.log('tried and caught error:', err) }
   }
 
   render() {
     return (
       //Wrap the entire app in your enhanced provider component, and all consumer descendants will be able to access the store
       <MyProvider>
-
-        <div className="App">
-
-          <button onClick={this.getGarbage}>garbage</button>
-          <a href="http://example.com">example.com</a>
-          <a href="/auth/twitter">twitter auth link (only works in prod when express hosts client app on same port)</a>
-          <p>{this.state.response}</p>
-          <Chart />
-          <hr/>
-
-          <p>testing context api</p>
-          {/*
-            The Consumer below must ALWAYS be rendered with only ONE function as a child. no comments either!!
-            The Consumer component subscribes to context changes. The function receives the current context value and returns a React node. All consumers re-render whenever the Provider value changes.
-          */}
-          <Consumer>
-            { ( {state,actions} )=> (  //value object available to consumer from provider is destructured
-              <Fragment>
-                <p>{`cats from dynamic store: ${state.cats}`}</p>
-                <p>pies:{state.pies}</p>
-                <button onClick={actions.incrementCats}>more cats!</button>
-              </Fragment>
-            ) }
-          </Consumer>
-          <hr/>
-
-          <p>testing render prop pattern/technique</p>
-          {/* https://reactjs.org/docs/render-props.html */}
-          {/* below I am using a component with a render prop by providing the prop in the named list of attributes. can also be inside the element as a child function, and called in the component as props.children() :
-            <Piggy>{ data => <p>I'm a pig that likes:{data}</p>}</Piggy>
-          */}
-          <Piggy render={ data => <p>I'm a pig that likes:{data}</p> }/>
-          
-          <hr/>
           <Router>
-            <Fragment>
+        <div className="App">
+          
+            <Frag>
+              {/*below using bulma hero to hold everything inside*/}
+              <section className="hero is-info is-fullheight">
 
-              {/* regular link here triggers refresh and load this main component again. messy, but gets the job done quickly */}
-              <a href='/'>Home</a>
+                <div className="hero-head">
+                  <div className="navbar">
+                    <div className="container">
+                      <div className="navbar-brand">
+                        <a className="navbar-item is-size-3">Voting App</a>
+                        <div className="navbar-burger burger"><span/><span/><span/></div>
+                      </div>
+                      {/* js el.classList.toggle('is-active') toggles is-active class on navbar-menu: to show it when the burger is clicked */}
+                      <div className="navbar-menu">
+                        <div className="navbar-end">
+                          {/* regular link here triggers refresh and load this main component again. messy, but gets the job done quickly */}
+                          <a className='navbar-item is-size-5' href='/'>Home</a>
+                          <Link className='navbar-item is-size-5' to='/cat-farts'>Cat Farts</Link>
+                          <a className="navbar-item is-size-5">All Polls</a>
+                          <a className="navbar-item is-size-5">My Polls</a>
+                          <a className="navbar-item is-size-5">New Poll</a>
+                          <div className="navbar-item">
+                            <a className="button is-link">Twitter Sign In</a> 
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="hero-body">
+                  <div className="container main">
+
+                    <PollList />
+
+                    <Switch>
+                      <Route path='/cat-farts' render={ ()=> <div>cat fart component</div> }/>
+                      <Route path='/squirrel-poop' component={ Squirrelpoop }/>
+                      <Route path='/dog-breath' render={ props=> <DogBreath {...props} age={42}/> }/>
+                    </Switch>
+
+                  </div>
+                </div>
+
+                <div className="hero-foot">
+                  <div className="container">
+                    <span className='is-size-7'>
+                    Built by Jesse Tan Rivero. Github repo <a href="https://github.com/agentjesse/voting_app_fcc"><strong>here</strong></a>
+                    </span>
+                  </div>
+                </div>
+
+              </section>
+
+
               
+              <p>everything below here must be removed before release</p>
               {/* proper links to routes that create modified anchor tags (prevent default refresh) */}
-              <Link to='/cat-farts'>Cat Farts</Link>
               <Link to='/squirrel-poop'>Squirrel poop</Link>
               <Link to='/dog-breath'>Dog breath</Link>
 
-              {/*
-                different types of rendering. <Switch> renders the first mathched <Route>/<Redirect> exclusively. In contrast, every <Route> that matches the location renders inclusively.
-              */}
-              <Switch>
-                <Route path='/cat-farts' render={ ()=> <div>cat fart component</div> }/>
-                <Route path='/squirrel-poop' component={ Squirrelpoop }/>
-                <Route path='/dog-breath' render={ props=> <DogBreath {...props} age={42}/> }/>
-              </Switch>
-
-              <hr/>
-
-            </Fragment>
-          </Router>
+            </Frag>
 
         </div>
-
+          </Router>
       </MyProvider>
 
     )
   }
 }
 
-
-const Piggy = ( {render} ) => { //destructure props.render
-  const food = 'apples'
-  // the jsx you return below will appear where the Piggy component was used.
-  //call the passed in function that will used some data argument (in this case const food) and it will return jsx, which you in turn return from this component
-  return render(food)
-  //.....or more stuff can be done instead of just calling the function with data, like rendering extra components:
-  // return (
-  //   <div>
-  //     <p>i'm a paragraph in a div. rendered before calling the render prop function</p>
-  //     {render(food)}
-  //   </div>
-  // )
-}
+const PollList = () =>
+  Array(20).fill().map( (val,i) => <p key={String(i)}>hi</p> ) //items will never be reordered so index key is ok here
 
 const Squirrelpoop = ( { match: {url} } ) =>
   <div>Squirrel poop component with url: {url}</div>

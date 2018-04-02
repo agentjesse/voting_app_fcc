@@ -1,9 +1,19 @@
-.App {
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-}
-
 hr {
   width: 100%;
+}
+
+.hero.is-fullheight .hero-body {
+  align-items: stretch;
+  padding: 0.75rem;
+}
+
+.main {
+  border-radius: 10px;
+  padding: 0.25rem 0.5rem;
+  background-color: #5bb5f1;
+}
+
+.hero-foot {
+  padding-left: 0.5rem;
+  padding-bottom: 0.25rem;
 }
