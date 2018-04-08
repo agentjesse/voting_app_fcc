@@ -1,11 +1,13 @@
 //packages
 require('dotenv').config()
 const express = require('express'),
-  // cors = require('cors'),
-  session = require('express-session'),
-  passport = require('passport'),
-  TwitterStrategy = require('passport-twitter').Strategy
+  mongoClient = require('mongodb').MongoClient,
+  uri = `mongodb://${process.env.dbusername}:${process.env.dbpassword}@ds155288.mlab.com:55288/fcc_voting_app`
+  // session = require('express-session'),
+  // passport = require('passport'),
+  // TwitterStrategy = require('passport-twitter').Strategy
 
+/*  
 //setup passport
 passport.use(new TwitterStrategy(
   {
@@ -26,33 +28,30 @@ passport.use(new TwitterStrategy(
 ) )
 passport.serializeUser( (user, done) => done(null, user) )
 passport.deserializeUser( (user, done) => done(null, user) )
+*/
 
 //create app
 const app = express()
 
 //middleware
-  //log all requests received
-  // app.use( /^\S+/, (req,res,next) => { //this route path matches 1 or more non whitespace chars
-  // app.use('/', (req,res,next) => { //matches /, /apples, /apples/bears
+  //logger
   app.use( (req,res,next) => { //defaults to '/'
     console.log(`${req.method} request received with url: ${req.originalUrl}`)
     next()
   })
 
-  //enable ALL cors requests
-  // app.use(cors())
-
+  //parse requests with urlencoded or json  payloads to make req.body object
+  app.use( express.urlencoded({extended:false}) )
+  app.use( express.json() )
+  
+  /*
   // configure/use express-session middleware BEFORE PASSPORT!!!!
   //this saves a cookie to the browser with the user. future requests that don't originate from the react app will have access to req.user. the twitter auth link from production originates from the app but the redirection then uses the verify callback which populates req.user
-  app.use(session( {secret:'poopooface404omg', resave:true, saveUninitialized:true} ) )
+  app.use(session( {secret:'idontknowwhatthisis', resave:true, saveUninitialized:true} ) )
   
   //use passport
   app.use(passport.initialize())
   app.use(passport.session())
-
-  //parse requests with urlencoded or json  payloads to make req.body object
-  app.use( express.urlencoded({extended:false}) )
-  app.use( express.json() )
 
   // Redirect the user to Twitter for authentication.  When complete, Twitter will redirect to /auth/twitter/callback
   app.get('/auth/twitter', passport.authenticate('twitter') )
@@ -70,14 +69,38 @@ const app = express()
     console.log(`/poo2 current user: ${req.user}`)
     res.sendFile( `${__dirname}/test2.html` )
   })
-  app.post( '/give_food', (req,res,next) => {
-    console.log(`/give_food current user: ${req.user}`)
-    console.log(req.headers['content-type'], req.body)
-    res.send(`received: ${req.body.food}`)
-  })
-  app.get( '/garbage', (req,res,next) => {
-    res.send({poops:41})
-  })
+  */
+
+  app.post( '/send_poll', (req,res,next) => {
+    // console.log(`/give_food current user: ${req.user}`)
+    // console.log(req.headers['content-type'], req.body)
+    mongoClient.connect( uri, (err,client) => {
+      const db = client.db('fcc_voting_app')
+      db.collection('polls')
+        .insertOne( req.body, (err,result) => {
+          if (err) console.error(err)
+          console.log('inserted 1 document into polls collection')
+          console.log( result.ops )
+          res.send( 'server received poll' )
+          // res.send('received and added to database:\n' + JSON.stringify(req.body) )
+        } )
+    } )
+  } )
+
+  app.get( '/get_polls', (req,res,next) => {
+    //connect to mongodb server and return an array of the polls to react
+    mongoClient.connect( uri, (err,client) => {
+      const db = client.db('fcc_voting_app')
+      db.collection('polls')
+        .find( {}, { sort:{created:1} } )
+        .toArray( (err,docsArr) => {
+          if (err) console.error(err)
+          // console.log(docsArr)
+          res.send(docsArr)
+          client.close()
+        } )
+    } )
+  } )
   
   app.get('/api/hello', (req,res) => {
     res.send({ express: '...Hello From Express' })

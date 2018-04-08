@@ -9,8 +9,16 @@ hr {
 
 .main {
   border-radius: 10px;
-  padding: 0.25rem 0.5rem;
+  padding: 0.5rem;
   background-color: #5bb5f1;
+}
+.container.main .title {
+  margin-top: 0.25rem;
+}
+/* edit bulma message block appearance */
+.messageMod {
+  padding: 0.25em 1em !important;
+  margin-bottom: 0.125rem !important;
 }
 
 .hero-foot {

@@ -30,15 +30,47 @@ class MyProvider extends Component {
   }
 }
 
-
 class App extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-    }
+  state = {
+    polls: undefined
   }
 
   componentDidMount() {
+    fetch('/get_polls')
+      .then( res => {
+        if(res.ok) return res.json()
+        throw new Error('Network response error.')
+      } )
+      .then( data => {
+        console.log(data)
+      } )
+      .catch( error => console.log('Error with your fetch operation: ', error.message) )
+  }
+
+  sendPoll() {
+    const poll =
+      {
+        'pollTitle': 'favourite candy',
+        'choices': { 'chocolate':1 ,'gum':666 },
+        "created": Date.now(),
+        'byUser': 'TommyTibble39X'
+      }
+    fetch('/send_poll',
+      {
+        method: 'POST',
+        body: JSON.stringify( poll ),
+        headers: {'content-type': 'application/json'}
+      }
+    )
+      .then( res => {
+        // if(res.ok) return res.text()
+        if(res.ok) return res.text()
+        throw new Error('Network response error.')
+      } )
+      .then( data => {
+        console.log(data)
+      } )
+      .catch( error => console.log('Error with your fetch operation: ', error.message) )
   }
 
   render() {
@@ -46,7 +78,7 @@ class App extends Component {
       //Wrap the entire app in your enhanced provider component, and all consumer descendants will be able to access the store. here the router wraps the App div first to keep name for the component and not even need a fragment like you used before
       <MyProvider>
         <Router>
-          <div className="App">
+          <div lowercasecustmattr='4 is great' className="App">
 
             {/*below using bulma hero to hold everything inside*/}
             <section className="hero is-info is-fullheight">
@@ -62,11 +94,9 @@ class App extends Component {
                     <div className="navbar-menu">
                       <div className="navbar-end">
                         {/* regular link here triggers refresh and load this main component again. messy, but gets the job done quickly */}
-                        <a className='navbar-item is-size-5' href='/'>Home</a>
-                        <Link className='navbar-item is-size-5' to='/cat-farts'>Cat Farts</Link>
-                        <a className="navbar-item is-size-5">All Polls</a>
-                        <a className="navbar-item is-size-5">My Polls</a>
-                        <a className="navbar-item is-size-5">New Poll</a>
+                        <Link className='navbar-item is-size-5' to='/'>Home</Link>
+                        <Link className='navbar-item is-size-5' to='/my-polls'>My Polls</Link>
+                        <Link className='navbar-item is-size-5' to='/new-poll'>New Poll</Link>
                         <div className="navbar-item">
                           <a className="button is-link is-rounded">Twitter Sign In</a> 
                         </div>
@@ -78,13 +108,15 @@ class App extends Component {
 
               <div className="hero-body">
                 <div className="container main">
+                  <button onClick={this.sendPoll}>send test poll</button>
 
-                  <PollList />
+                  <h1 className="title has-text-centered">All Polls</h1>
+                  <h1 className="subtitle has-text-centered">Collection of polls from users of this app.</h1>
 
                   <Switch>
-                    <Route path='/cat-farts' render={ ()=> <div>cat fart component</div> }/>
-                    <Route path='/squirrel-poop' component={ Squirrelpoop }/>
-                    <Route path='/dog-breath' render={ props=> <DogBreath {...props} age={42}/> }/>
+                    <Route exact path='/' component={ PollList }/>
+                    <Route path='/my-polls' render={ ()=> <div>MyPolls component</div> }/>
+                    <Route path='/new-poll' render={ ()=> <div>NewPoll component</div> }/>
                   </Switch>
 
                 </div>
@@ -101,31 +133,23 @@ class App extends Component {
             </section>
 
 
-            
-            <p>everything below here must be removed before release</p>
-            {/* proper links to routes that create modified anchor tags (prevent default refresh) */}
-            <Link to='/squirrel-poop'>Squirrel poop</Link>
-            <Link to='/dog-breath'>Dog breath</Link>
-
           </div>
         </Router>
       </MyProvider>
-
     )
   }
 }
 
 const PollList = () =>
-  Array(20).fill().map( (val,i) => <p key={String(i)}>hi</p> ) //items will never be reordered so index key is ok here
-
-const Squirrelpoop = ( { match: {url} } ) =>
-  <div>Squirrel poop component with url: {url}</div>
-
-const DogBreath = ( { match: {url}, age } ) =>
-  <div>
-    DogBreath component with url: {url}
-    <br/>
-    age: {age}
-  </div>
+  //items will never be reordered so index key is ok here
+  // warning: messageMod overwrites the bulma component's css with !important.
+  true ? (
+    Array(5).fill().map( (val,i) => <div className="message message-body messageMod" key={String(i)}>
+        {i}Lorem ipsum dolor. <strong>Pellentesque risus mi</strong> et dictum <a>felis venenatis</a> efficitur.
+      </div>
+    )
+  ):(
+    <p>false</p>
+  )
 
 export default App
