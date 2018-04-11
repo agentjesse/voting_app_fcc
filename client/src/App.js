@@ -11,7 +11,7 @@ const { Provider, Consumer } = React.createContext()
 class MyProvider extends Component {
   state = {
     cats:43,
-    pies:10000
+    pies:1000
   }
   render() {
     return (
@@ -32,10 +32,14 @@ class MyProvider extends Component {
 
 class App extends Component {
   state = {
-    polls: undefined
+    user: null,
+    polls: null
   }
 
   componentDidMount() {
+    //setState() in here triggers an extra rendering, but it will happen before the screen updates. Even though render() will be called twice, the user won’t see the intermediate state.
+    
+    /*
     fetch('/get_polls')
       .then( res => {
         if(res.ok) return res.json()
@@ -45,6 +49,27 @@ class App extends Component {
         console.log(data)
       } )
       .catch( error => console.log('Error with your fetch operation: ', error.message) )
+    */
+
+    //code in here will run once after component mounts, not after every render call as it would seem. For that, use componentDidUpdate() but note it will ignore the initial render call.
+    const user = localStorage.getItem('user')
+    if (user) {
+      console.log('signed in mode')
+      this.setState({user})
+    }
+    else console.log('public mode')
+  }
+
+  signInOut = () => {
+    if (this.state.user) { //localStorage check possible too. componentDidMount will set user in state if user in LocalStorage
+      alert('user in state and localStorage, both will be cleared to sign out.')
+      localStorage.removeItem('user')
+      this.setState({user:null})
+    }
+    else {
+      alert('no user in state, redirecting to sign in...')
+      window.location.pathname = '/auth/twitter'
+    }
   }
 
   sendPoll() {
@@ -52,7 +77,7 @@ class App extends Component {
       {
         'pollTitle': 'favourite candy',
         'choices': { 'chocolate':1 ,'gum':666 },
-        "created": Date.now(),
+        'created': Date.now(),
         'byUser': 'TommyTibble39X'
       }
     fetch('/send_poll',
@@ -78,7 +103,7 @@ class App extends Component {
       //Wrap the entire app in your enhanced provider component, and all consumer descendants will be able to access the store. here the router wraps the App div first to keep name for the component and not even need a fragment like you used before
       <MyProvider>
         <Router>
-          <div lowercasecustmattr='4 is great' className="App">
+          <div className="App">
 
             {/*below using bulma hero to hold everything inside*/}
             <section className="hero is-info is-fullheight">
@@ -95,10 +120,13 @@ class App extends Component {
                       <div className="navbar-end">
                         {/* regular link here triggers refresh and load this main component again. messy, but gets the job done quickly */}
                         <Link className='navbar-item is-size-5' to='/'>Home</Link>
-                        <Link className='navbar-item is-size-5' to='/my-polls'>My Polls</Link>
+                        { this.state.user &&  
+                          <Link className='navbar-item is-size-5' to='/my-polls'>My Polls</Link>
+                        }
                         <Link className='navbar-item is-size-5' to='/new-poll'>New Poll</Link>
+
                         <div className="navbar-item">
-                          <a className="button is-link is-rounded">Twitter Sign In</a> 
+                          <button className="button is-link is-rounded" onClick={this.signInOut}>Twitter Sign In/Out</button>
                         </div>
                       </div>
                     </div>
@@ -109,6 +137,9 @@ class App extends Component {
               <div className="hero-body">
                 <div className="container main">
                   <button onClick={this.sendPoll}>send test poll</button>
+                  <button onClick={()=>console.log(this.state)}>log state</button>
+
+                  
 
                   <h1 className="title has-text-centered">All Polls</h1>
                   <h1 className="subtitle has-text-centered">Collection of polls from users of this app.</h1>
@@ -132,7 +163,6 @@ class App extends Component {
 
             </section>
 
-
           </div>
         </Router>
       </MyProvider>
@@ -141,15 +171,11 @@ class App extends Component {
 }
 
 const PollList = () =>
-  //items will never be reordered so index key is ok here
-  // warning: messageMod overwrites the bulma component's css with !important.
-  true ? (
-    Array(5).fill().map( (val,i) => <div className="message message-body messageMod" key={String(i)}>
+  //items will never be reordered so index key is ok here. messageMod overwrites the bulma component's css with !important.
+  Array(3).fill()
+    .map( (val,i) => <div className="message message-body messageMod" key={String(i)}>
         {i}Lorem ipsum dolor. <strong>Pellentesque risus mi</strong> et dictum <a>felis venenatis</a> efficitur.
       </div>
     )
-  ):(
-    <p>false</p>
-  )
 
 export default App

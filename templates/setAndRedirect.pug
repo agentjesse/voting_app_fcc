@@ -1,0 +1,12 @@
+//- the point of this simple page is to load the logged in user into localstorage for react to grab later
+doctype html
+html(lang='en')
+  head
+    meta(charset='utf-8')
+    title redirecting...
+  body
+    noscript You need to enable JavaScript to run this app.
+    script.
+      localStorage.setItem( 'user', '#{user}' )
+      //- console.log( 'stored in localStorage \'user\': ' + localStorage.getItem('user') )
+      window.location.pathname = '/'

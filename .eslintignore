@@ -1,0 +1,2 @@
+#don't run eslint on create-react-app project folder, it has its own
+/client
