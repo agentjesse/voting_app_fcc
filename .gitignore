@@ -8,7 +8,7 @@ node_modules
 .env
 
 # testing
-/coverage
+/client/coverage
 test.html
 test2.html
 test3.html
@@ -17,12 +17,12 @@ test3.html
 /client/build
 
 # misc
-.DS_Store
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+/client/.DS_Store
+/client/.env.local
+/client/.env.development.local
+/client/.env.test.local
+/client/.env.production.local
 
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+/client/npm-debug.log*
+/client/yarn-debug.log*
+/client/yarn-error.log*

@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server",
     "build-client": "cd client && npm run build && cd ..",
-    "client": "cd client && npm run start",
+    "client": "cd client && npm run start && cd ..",
     "server": "nodemon -e js,html,json,css,pug",
     "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\""
   },

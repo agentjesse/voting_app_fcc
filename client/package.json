@@ -1,15 +1,14 @@
 {
-  "name": "voting_app",
+  "name": "client",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "ajv": "^6.4.0",
-    "chart.js": "^2.7.2",
-    "randomcolor": "^0.5.3",
     "react": "^16.3.1",
     "react-dom": "^16.3.1",
-    "react-router-dom": "^4.2.2",
-    "react-scripts": "^1.1.4"
+    "react-scripts": "1.1.4",
+    "chart.js": "^2.7.2",
+    "randomcolor": "^0.5.3",
+    "react-router-dom": "^4.2.2"
   },
   "scripts": {
     "start": "react-scripts start",

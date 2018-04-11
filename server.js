@@ -118,7 +118,7 @@ app.set('views', `${__dirname}/templates`)
   } )
   
   app.get('/api/hello', (req,res) => {
-    res.send({ express: '...Hello From Express' });
+    res.send({ express: '...Hello From Express' })
   })
 
   //Serve static files from the React app
