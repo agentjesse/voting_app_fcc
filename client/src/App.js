@@ -120,11 +120,13 @@ class App extends Component {
                       <div className="navbar-end">
                         {/* regular link here triggers refresh and load this main component again. messy, but gets the job done quickly */}
                         <Link className='navbar-item is-size-5' to='/'>Home</Link>
-                        { this.state.user &&  
-                          <Link className='navbar-item is-size-5' to='/my-polls'>My Polls</Link>
+                        {/* conditional render using the authorized user links */}
+                        { this.state.user &&
+                            <Frag>
+                              <Link className='navbar-item is-size-5' to='/my-polls'>My Polls</Link>
+                              <Link className='navbar-item is-size-5' to='/new-poll'>New Poll</Link>
+                            </Frag>
                         }
-                        <Link className='navbar-item is-size-5' to='/new-poll'>New Poll</Link>
-
                         <div className="navbar-item">
                           <button className="button is-link is-rounded" onClick={this.signInOut}>Twitter Sign In/Out</button>
                         </div>
